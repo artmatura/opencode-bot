@@ -111,20 +111,36 @@ class OpenCodeBot:
             await query.edit_message_text("Выберите задачу для завершения:", reply_markup=reply_markup)
 
     async def handle_yougile_action(self, query, context):
+        if not self.yougile.has_token():
+            await query.edit_message_text(
+                "🔑 YouGile не подключён.\n\n"
+                "Нужно добавить токен API YouGile в переменные Railway:\n"
+                "1. Откройте yougile.com → Настройки → API\n"
+                "2. Создайте токен\n"
+                "3. В Railway добавьте переменную `yougile_token`"
+            )
+            return
+
         if query.data == "yougile_tasks":
             tasks = await self.yougile.get_tasks()
-            text = "📋 Ваши задачи:\n\n"
+            if not tasks:
+                await query.edit_message_text("📋 Задач пока нет или ошибка доступа.")
+                return
+            text = "📋 Последние задачи:\n\n"
             for i, task in enumerate(tasks[:10], 1):
-                text += f"{i}. {task['title']} [{task['status']}]\n"
+                text += f"{i}. {task.get('title', 'Без названия')}\n"
             await query.edit_message_text(text)
         elif query.data == "yougile_create":
             self.user_states[query.from_user.id] = "waiting_yougile_task"
             await query.edit_message_text("Введите название задачи:")
         elif query.data == "yougile_projects":
             projects = await self.yougile.get_projects()
+            if not projects:
+                await query.edit_message_text("📊 Проекты пусты или ошибка доступа.")
+                return
             text = "📊 Проекты:\n\n"
-            for i, proj in enumerate(projects, 1):
-                text += f"{i}. {proj['title']}\n"
+            for i, proj in enumerate(projects[:10], 1):
+                text += f"{i}. {proj.get('title', 'Без названия')}\n"
             await query.edit_message_text(text)
 
     async def handle_opencode_action(self, query, context):

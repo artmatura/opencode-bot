@@ -44,7 +44,7 @@ class BotConfig:
 
     @property
     def yougile_token(self) -> str:
-        return self.config.get("yougile_token", "")
+        return os.environ.get("yougile_token", self.config.get("yougile_token", ""))
 
     def update(self, key: str, value):
         self.config[key] = value
