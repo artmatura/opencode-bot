@@ -1,0 +1,7 @@
+{
+  "bot_token": "YOUR_BOT_TOKEN_HERE",
+  "allowed_users": [],
+  "opencode_path": "opencode",
+  "yougile_token": "",
+  "webhook_url": ""
+}
