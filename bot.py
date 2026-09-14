@@ -20,7 +20,14 @@ class OpenCodeBot:
         self.opencode = OpenCodeIntegration()
         self.user_states = {}
 
+    def is_allowed(self, user_id: int) -> bool:
+        allowed = self.config.allowed_users
+        return not allowed or user_id in allowed
+
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if not self.is_allowed(update.effective_user.id):
+            await update.message.reply_text("⛔ Доступ запрещён. Этот бот только для владельца.")
+            return
         keyboard = [
             [InlineKeyboardButton("🎯 Фокус", callback_data="focus"),
              InlineKeyboardButton("📋 YouGile", callback_data="yougile")],
@@ -37,6 +44,9 @@ class OpenCodeBot:
     async def button_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query
         await query.answer()
+        if not self.is_allowed(query.from_user.id):
+            await query.edit_message_text("⛔ Доступ запрещён. Этот бот только для владельца.")
+            return
 
         if query.data == "focus":
             await self.show_focus_menu(query)
@@ -146,6 +156,9 @@ class OpenCodeBot:
 
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.message.from_user.id
+        if not self.is_allowed(user_id):
+            await update.message.reply_text("⛔ Доступ запрещён. Этот бот только для владельца.")
+            return
         text = update.message.text
 
         if user_id in self.user_states:
