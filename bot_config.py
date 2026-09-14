@@ -29,7 +29,7 @@ class BotConfig:
 
     @property
     def bot_token(self) -> str:
-        return self.config.get("bot_token", "")
+         return os.environ.get("bot_token", self.config.get("bot_token", ""))
 
     @property
     def allowed_users(self) -> list:
