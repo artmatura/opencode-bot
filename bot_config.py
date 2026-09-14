@@ -29,10 +29,10 @@ class BotConfig:
 
     @property
     def bot_token(self) -> str:
-         return os.environ.get("bot_token", self.config.get("bot_token", ""))
+        return os.environ.get("bot_token", self.config.get("bot_token", ""))
 
     @property
-     def allowed_users(self) -> list:
+    def allowed_users(self) -> list:
         env_users = os.environ.get("allowed_users", "")
         if env_users.strip():
             return [int(u.strip()) for u in env_users.split(",") if u.strip()]
